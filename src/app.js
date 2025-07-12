@@ -13,7 +13,7 @@ dotenv.config()
 app.use(express.json())
 app.use(cors())
 
-const PORT =process.env.PORT || 9000
+const PORT =process.env.PORT 
 
 
 app.use("/upload",express.static("src/document"))

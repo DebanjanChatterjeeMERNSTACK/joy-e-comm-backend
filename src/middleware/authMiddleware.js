@@ -3,7 +3,7 @@ const dotenv=require("dotenv")
 dotenv.config()
 
 const authenticate = (req, res, next) => {
-  const token = req.header("Authorization")
+  const token = req.header("Authorization").split(" ")[1] 
 
   if (!token) return res.send({ mess: "error", status: 400, text: "Access denied" });
 
