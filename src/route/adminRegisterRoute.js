@@ -3,6 +3,7 @@ const route = express.Router();
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 const adminRegister = require("../controller/adminRegisterController");
+const path =require("path")
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {

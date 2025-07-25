@@ -46,23 +46,11 @@ const registrationSchema = new mongoose.Schema(
       type: String,
       required: [true, "Aadhar Number Is Required"],
        unique: [true, "Aadhar Number Alrady Exists"],
-      validate: {
-        validator: function (value) {
-          return /^[2-9]{1}[0-9]{3}\s[0-9]{4}\s[0-9]{4}$/.test(value);
-        },
-        message: "Invalid Aadhar Number (Format: XXXX XXXX XXXX)",
-      },
     },
     panNumber: {
       type: String,
       required: [true, "PAN Number Is Required"],
       unique:[true, "Pan Number Already Exists"],
-      validate: {
-        validator: function (value) {
-          return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value);
-        },
-        message: "Invalid PAN Number",
-      },
     },
     aadharImage: {
       type: String,
@@ -86,7 +74,7 @@ const registrationSchema = new mongoose.Schema(
     },
     isActive: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   {

@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const dotenv = require("dotenv");
 const nodemailer = require("nodemailer");
 
+
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
@@ -20,6 +21,7 @@ const transporter = nodemailer.createTransport({
 
 const adminRegisterData = async (req, res) => {
   const {
+    role,
     adminName,
     email,
     password,
@@ -30,8 +32,8 @@ const adminRegisterData = async (req, res) => {
     razorpay_order_id,
     razorpay_signature,
   } = req.body;
-  const aadharImageData = req.files[aadharImage][0].filename;
-  const panImageData = req.files[panImage][0].filename;
+  const aadharImageData = req.files["aadharImage"][0].filename;
+  const panImageData = req.files["panImage"][0].filename;
   try {
     const aadharImage = `${process.env.URL}/upload/${aadharImageData}`;
     const panImage = `${process.env.URL}/upload/${panImageData}`;
@@ -44,7 +46,7 @@ const adminRegisterData = async (req, res) => {
       html: "<b>Hello world?</b>", // html body
     };
 
-    if (!adminName || !email || !password || !phoneNumber|| !aadharNumber ||  !panNumber) { 
+    if (!role || !adminName || !email || !password || !phoneNumber|| !aadharNumber ||  !panNumber) { 
         return res.send({
         mess: "error",
         status: 400,
@@ -66,6 +68,7 @@ const adminRegisterData = async (req, res) => {
         const saltRounds = 10;
         const hass_password = await bcrypt.hash(password, saltRounds);
         const data = await adminRegisterSchema({
+          role:role,
           adminName: adminName,
           email: email,
           password: hass_password,
@@ -122,62 +125,85 @@ const adminRegisterPayment = async (req, res) => {
 
   instance.orders.create(options, function (err, value) {
     if (err) {
+    
       return res.send({ mess: "error", status: 400, text: err.message });
-    }
+    }else{
+  
     return res.send({
       mess: "success",
       status: 200,
       data: value,
       text: "Order Created",
     });
+  }
   });
 };
 
 const adminRegisterVerify = async (req, res) => {
   try {
-    const { razorpay_orderID, razorpay_paymentID, razorpay_signature, email } =
-      req.body;
+    const {
+      razorpay_orderID,
+      razorpay_paymentID,
+      razorpay_signature,
+      email,
+    } = req.body;
+
+   
 
     if (!email) {
       return res.send({
         mess: "error",
         status: 400,
-        text: "Please Send The Email",
+        text: "Please send the email",
       });
     }
-    const data = await adminRegisterSchema.findOne({ email: email });
-    if (data) {
+
+    // Check if email is already registered
+    const existingAdmin = await adminRegisterSchema.findOne({ email: email });
+    if (existingAdmin) {
       return res.send({
         mess: "error",
         status: 400,
-        text: "Email All Ready Register",
+        text: "Email already registered",
       });
     }
 
-    const sign = razorpay_orderID + "|" + razorpay_paymentID;
-
-    const resultSign = crypto
+    // Verify payment signature
+    const generatedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(sign.toString())
+      .update(`${razorpay_orderID}|${razorpay_paymentID}`)
       .digest("hex");
 
-    if (razorpay_signature == resultSign) {
+    
+
+    if (generatedSignature === razorpay_signature) {
       return res.send({
         mess: "success",
         status: 200,
-        text: "Payment Successfully",
+        text: "Payment Verified Successfully",
         data: {
           razorpay_orderID,
           razorpay_paymentID,
           razorpay_signature,
         },
       });
+    } else {
+      return res.send({
+        mess: "error",
+        status: 400,
+        text: "Invalid Payment Signature",
+      });
     }
   } catch (err) {
-    console.log(err);
-    return res.send({ mess: "error", status: 400, text: err.message });
+    console.error("Verification Error:", err);
+    return res.send({
+      mess: "error",
+      status: 400,
+      text: err.message,
+    });
   }
 };
+
 
 module.exports = {
   adminRegisterData,
