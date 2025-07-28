@@ -259,7 +259,7 @@ const adminForgetpassword = async (req, res) => {
 const adminResetpassword = async (req, res) => {
   try {
     const id = req.params.id;
-    const { newPassword, confirmPassword } = req.body;
+    const { password, confirmPassword } = req.body;
 
     const data = await adminRegisterSchema.findOne({ _id: id });
 
@@ -271,7 +271,7 @@ const adminResetpassword = async (req, res) => {
       });
     }
 
-    if (newPassword !== confirmPassword) {
+    if (password !== confirmPassword) {
       return res.send({
         mess: "error",
         status: 400,

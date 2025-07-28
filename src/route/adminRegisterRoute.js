@@ -19,7 +19,6 @@ const upload = multer({ storage: storage });
 route.post("/admin_register_payment", adminRegister.adminRegisterPayment);
 
 
-
 route.post("/admin_register_verify",adminRegister.adminRegisterVerify);
 
 
