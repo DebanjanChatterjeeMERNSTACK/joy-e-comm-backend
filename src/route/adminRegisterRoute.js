@@ -25,4 +25,10 @@ route.post("/admin_register_verify",adminRegister.adminRegisterVerify);
 
 route.post("/admin_register",upload.fields([{ name: 'aadharImage', maxCount: 1 }, { name: 'panImage', maxCount: 1 }]),adminRegister.adminRegisterData)
 
+
+route.post("/admin_forgetpassword" ,adminRegister.adminForgetpassword)
+
+
+route.post("/admin_resetpassword/:id" ,adminRegister.adminResetpassword)
+
 module.exports = route;
