@@ -119,7 +119,33 @@ const adminRegisterData = async (req, res) => {
 };
 
 const adminRegisterPayment = async (req, res) => {
-  const { amount } = req.body;
+  const { amount , email, aadharNumber, panNumber } = req.body;
+
+
+  const existingAdmin = await adminRegisterSchema.findOne({ email: email });
+    if (existingAdmin) {
+      return res.send({
+        mess: "error",
+        status: 400,
+        text: "Email already registered",
+      });
+    }
+    const existingAadhar = await adminRegisterSchema.findOne({ aadharNumber: aadharNumber });
+    if (existingAadhar) {
+      return res.send({
+        mess: "error",
+        status: 400,
+        text: "Aadhar number already registered",
+      });
+    }
+    const existingPan = await adminRegisterSchema.findOne({ panNumber: panNumber });
+    if (existingPan) {
+      return res.send({
+        mess: "error",
+        status: 400,
+        text: "Pan number already registered",
+      });
+    }
 
   if (amount < 100) {
     return res.send({
