@@ -1,4 +1,4 @@
-const adminRegisterSchema = require("../model/adminRegisterSchema");
+const adminRegisterSchema = require("../model/registerSchema");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
@@ -26,14 +26,6 @@ const adminLogin = async (req, res) => {
       });
     }
 
-    if (!data.isActive) {
-      return res.send({
-        mess: "error",
-        status: 400,
-        text: "Please Wait Some For It...",
-      });
-    }
-
     const match = await bcrypt.compare(password, data.password);
     if (!match) {
       return res.send({
@@ -44,7 +36,7 @@ const adminLogin = async (req, res) => {
     }
 
     jwt.sign(
-      { _id: data._id, adminName: data.adminName, role: data.role },
+      { _id: data._id, storeName:data.storeName,address:data.address, role: data.role },
       process.env.JWTKEY,
       { expiresIn: "24h" },
       (err, token) => {

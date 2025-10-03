@@ -12,7 +12,7 @@ const authenticate = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (err) {
-  return  res.send({ mess: "error", status: 400, text: err.message });
+  return  res.send({ mess: "error", status: 400, text: "Login Now" });
   }
 };
 
