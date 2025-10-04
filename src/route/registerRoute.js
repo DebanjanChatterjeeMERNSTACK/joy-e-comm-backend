@@ -12,8 +12,8 @@ route.get("/get_register",authenticate,authorize(["ceo"]),Register.getRegisterDa
 
 route.delete("/delete_register/:id",authenticate,authorize(["ceo"]),Register.deleteRegisterData)
 
-route.post("/admin_forgetpassword" ,Register.adminForgetpassword)
+// route.post("/admin_forgetpassword" ,Register.adminForgetpassword)
 
-route.post("/admin_resetpassword/:id" ,Register.adminResetpassword)
+// route.post("/admin_resetpassword/:id" ,Register.adminResetpassword)
 
 module.exports = route;

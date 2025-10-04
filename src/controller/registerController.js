@@ -158,102 +158,102 @@ const deleteRegisterData = async (req, res) => {
   }
 };
 
-const adminForgetpassword = async (req, res) => {
-  try {
-    const email = req.body.email;
-    const data = await registerSchema.findOne({ email: email });
+// const adminForgetpassword = async (req, res) => {
+//   try {
+//     const email = req.body.email;
+//     const data = await registerSchema.findOne({ email: email });
 
-    if (data) {
-      const mailOptions = {
-        from: process.env.MAIL_ID, // sender address
-        to: email, // recipient email
-        subject: "Reset Password", // subject line
-        text: "Please use the following link to reset your password.", // plain text body
-        html: `<p>Click the link below to reset your password:</p>
-         <a href="${process.env.FONTEND_URL}/resetpassword/${data._id}">Reset Password</a>`, // proper HTML body
-      };
+//     if (data) {
+//       const mailOptions = {
+//         from: process.env.MAIL_ID, // sender address
+//         to: email, // recipient email
+//         subject: "Reset Password", // subject line
+//         text: "Please use the following link to reset your password.", // plain text body
+//         html: `<p>Click the link below to reset your password:</p>
+//          <a href="${process.env.FONTEND_URL}/resetpassword/${data._id}">Reset Password</a>`, // proper HTML body
+//       };
 
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          return res.send({
-            mess: "error",
-            status: 400,
-            text: error.message,
-          });
-        } else {
-          return res.send({
-            mess: "success",
-            status: 200,
-            text: "Check Your Mail To Change Your Password",
-          });
-        }
-      });
-    } else {
-      return res.send({
-        mess: "error",
-        status: 400,
-        text: "Email Not Match",
-      });
-    }
-  } catch (err) {
-    return res.send({
-      mess: "error",
-      status: 400,
-      text: err.message,
-    });
-  }
-};
+//       transporter.sendMail(mailOptions, (error, info) => {
+//         if (error) {
+//           return res.send({
+//             mess: "error",
+//             status: 400,
+//             text: error.message,
+//           });
+//         } else {
+//           return res.send({
+//             mess: "success",
+//             status: 200,
+//             text: "Check Your Mail To Change Your Password",
+//           });
+//         }
+//       });
+//     } else {
+//       return res.send({
+//         mess: "error",
+//         status: 400,
+//         text: "Email Not Match",
+//       });
+//     }
+//   } catch (err) {
+//     return res.send({
+//       mess: "error",
+//       status: 400,
+//       text: err.message,
+//     });
+//   }
+// };
 
-const adminResetpassword = async (req, res) => {
-  try {
-    const id = req.params.id;
-    const { password, confirmPassword } = req.body;
+// const adminResetpassword = async (req, res) => {
+//   try {
+//     const id = req.params.id;
+//     const { password, confirmPassword } = req.body;
 
-    const data = await registerSchema.findOne({ _id: id });
+//     const data = await registerSchema.findOne({ _id: id });
 
-    if (!data) {
-      return res.send({
-        mess: "error",
-        status: 400,
-        text: "Id Not Match",
-      });
-    }
+//     if (!data) {
+//       return res.send({
+//         mess: "error",
+//         status: 400,
+//         text: "Id Not Match",
+//       });
+//     }
 
-    if (password !== confirmPassword) {
-      return res.send({
-        mess: "error",
-        status: 400,
-        text: "Password Not Match",
-      });
-    }
-    const saltRounds = 10;
-    const hass_password = await bcrypt.hash(password, saltRounds);
-    const update = await registerSchema.findOneAndUpdate(
-      { _id: id },
-      { password: hass_password }
-    );
+//     if (password !== confirmPassword) {
+//       return res.send({
+//         mess: "error",
+//         status: 400,
+//         text: "Password Not Match",
+//       });
+//     }
+//     const saltRounds = 10;
+//     const hass_password = await bcrypt.hash(password, saltRounds);
+//     const update = await registerSchema.findOneAndUpdate(
+//       { _id: id },
+//       { password: hass_password }
+//     );
 
-    if (update) {
-      return res.send({
-        mess: "success",
-        status: 200,
-        text: "Password Reset Successfully",
-      });
-    }
-  } catch (err) {
-    return res.send({
-      mess: "error",
-      status: 400,
-      text: err.message,
-    });
-  }
-};
+//     if (update) {
+//       return res.send({
+//         mess: "success",
+//         status: 200,
+//         text: "Password Reset Successfully",
+//       });
+//     }
+//   } catch (err) {
+//     return res.send({
+//       mess: "error",
+//       status: 400,
+//       text: err.message,
+//     });
+//   }
+// };
 
 module.exports = {
   addRegisterData,
-  adminForgetpassword,
+  // adminForgetpassword,
   updateRegisterData,
   getRegisterData,
   deleteRegisterData,
-  adminResetpassword,
+  // adminResetpassword,
 };
