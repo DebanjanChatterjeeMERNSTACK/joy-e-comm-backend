@@ -1,40 +1,15 @@
 const registerSchema = require("../model/registerSchema");
 const bcrypt = require("bcrypt");
 const dotenv = require("dotenv");
-const nodemailer = require("nodemailer");
 
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  service: "Gmail",
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.MAIL_ID, // the email you used to create app password
-    pass: process.env.MAIL_APP_PASSWORD, // your generated app password
-  },
-});
 
 const addRegisterData = async (req, res) => {
-  const {
-    storeName,
-    email,
-    password,
-    phoneNumber,
-    address
-  } = req.body;
- 
+  const { storeName, email, password, phoneNumber, address } = req.body;
+
   try {
-    if (
-      !adminName ||
-      !email ||
-      !password ||
-      !phoneNumber ||
-      !address ||
-      !storeName
-      
-    ) {
+    if (!email || !password || !phoneNumber || !address || !storeName) {
       return res.send({
         mess: "error",
         status: 400,
@@ -56,27 +31,16 @@ const addRegisterData = async (req, res) => {
     const data = await registerSchema({
       email: email,
       password: hass_password,
-      showPassword:password,
+      showPassword: password,
       phoneNumber: phoneNumber,
-      address:address,
-      storeName:storeName
+      address: address,
+      storeName: storeName,
     });
     data.save().then(() => {
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          return res.send({
-            mess: "error",
-            status: 400,
-            text: error.message,
-          });
-        } else {
-          return res.send({
-            mess: "success",
-            status: 200,
-            text: "Register Complete",
-            data: info,
-          });
-        }
+      return res.send({
+        mess: "success",
+        status: 200,
+        text: "Register Complete",
       });
     });
   } catch (err) {
@@ -84,26 +48,36 @@ const addRegisterData = async (req, res) => {
   }
 };
 
-const updateRegisterData=async(req, res)=>{
+const updateRegisterData = async (req, res) => {
   try {
-    const id =req.params.id
-    const {storeName,email,password,phoneNumber,address} =req.body
-     const saltRounds = 10;
+    const id = req.params.id;
+    const { storeName, email, password, phoneNumber, address } = req.body;
+    const saltRounds = 10;
     const hass_password = await bcrypt.hash(password, saltRounds);
-    const updateData= await registerSchema.findOneAndUpdate({_id:id},{storeName,email,password:hass_password, showPassword:password,phoneNumber,address})
+    const updateData = await registerSchema.findOneAndUpdate(
+      { _id: id },
+      {
+        storeName,
+        email,
+        password: hass_password,
+        showPassword: password,
+        phoneNumber,
+        address,
+      }
+    );
 
-    if(updateData){
+    if (updateData) {
       return res.send({
-            mess: "success",
-            status: 200,
-            text: "Update Successfully",
-          });
-    }else{
+        mess: "success",
+        status: 200,
+        text: "Update Successfully",
+      });
+    } else {
       return res.send({
-            mess: "success",
-            status: 400,
-            text: "Update Is Not Successfully",
-          });
+        mess: "success",
+        status: 400,
+        text: "Update Is Not Successfully",
+      });
     }
   } catch (err) {
     return res.send({
@@ -112,18 +86,68 @@ const updateRegisterData=async(req, res)=>{
       text: err.message,
     });
   }
-}
+};
 
-const getRegisterData=async(req,res)=>{
+const getRegisterData = async (req, res) => {
   try {
-    const getData= await registerSchema.find()
-    if(getData){
+    // Query params
+    const { search, page = 1, limit } = req.query;
+
+    // 1️⃣ Build query
+    let query = {};
+
+    if (search) {
+      query.$or = [
+        { storeName: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { phoneNumber: { $regex: search, $options: "i" } },
+        { address: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // 2️⃣ Pagination
+    const skip = (Number(page) - 1) * Number(limit);
+
+    // 3️⃣ Fetch vendors
+    const vendors = await registerSchema
+      .find(query)
+      .skip(skip)
+      .limit(Number(limit));
+
+    const totalCount = await registerSchema.countDocuments(query);
+
+    return res.send({
+      mess: "success",
+      status: 200,
+      text: "Store fetched successfully",
+      total: totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+      page: Number(page),
+      limit: Number(limit),
+      data: vendors,
+    });
+  } catch (err) {
+    return res.send({
+      mess: "error",
+      status: 400,
+      text: err.message,
+    });
+  }
+};
+
+const deleteRegisterData = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const data = await registerSchema.findOneAndDelete(
+      { _id: id },
+      { _id: id }
+    );
+    if (data) {
       return res.send({
-            mess: "success",
-            status: 200,
-            text: "Fetch Data Successfully",
-            data:getData
-          });
+        mess: "success",
+        status: 200,
+        text: "Delete Successfully",
+      });
     }
   } catch (err) {
     return res.send({
@@ -132,28 +156,7 @@ const getRegisterData=async(req,res)=>{
       text: err.message,
     });
   }
-}
-
-const  deleteRegisterData =async(req,res)=>{
-
-try {
-  const id =req.params.id
-  const data=await registerSchema.findOneAndDelete({_id:id},{_id:id})
-   if(data){
-     return res.send({
-            mess: "success",
-            status: 200,
-            text: "Delete Successfully",
-          });
-   }
-} catch (err) {
-   return res.send({
-      mess: "error",
-      status: 400,
-      text: err.message,
-    });
-}
-}
+};
 
 const adminForgetpassword = async (req, res) => {
   try {

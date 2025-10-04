@@ -4,7 +4,7 @@ const registrationSchema = new mongoose.Schema(
   {
     role: {
       type: String,
-      default: "manager",
+      default: "admin",
       enum: ["ceo", "manager", "admin"],
     },
     storeName: {
@@ -33,12 +33,6 @@ const registrationSchema = new mongoose.Schema(
     phoneNumber: {
       type: String,
       required: [true, "Phone Number Is Required"],
-      validate: {
-        validator: function (value) {
-          return /^[6-9]{1}[0-9]{9}$/.test(value); // Simple 10-digit mobile pattern (India)
-        },
-        message: "Invalid Phone Number",
-      },
     },
     address: {
       type: String,

@@ -9,6 +9,7 @@ const Login=require("./route/loginRoute")
 const Product =require("./route/productRoute")
 const PurchaseInvoice =require("./route/purchaseInvoiceRoute")
 const CustomerInvoice =require("./route/customerInvoiceRoute")
+const Customer =require("./route/customerRoute")
 
 dotenv.config()
 
@@ -27,7 +28,7 @@ app.use(Vendor)
 app.use(Product)
 app.use(PurchaseInvoice)
 app.use(CustomerInvoice)
-
+app.use(Customer)
 
 
 
