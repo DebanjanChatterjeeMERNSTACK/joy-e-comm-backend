@@ -149,3 +149,53 @@ exports.deleteProduct = async (req, res) => {
     });
   }
 };
+
+
+exports.getAllProductsSearch = async (req, res) => {
+  try {
+    const adminId = req.user._id;
+
+    // 👉 Query params
+    const {
+      search,
+    } = req.query;
+
+    // 👉 Build filter
+    let filter = { adminId };
+
+    // 🔍 Search filter
+    if (search) {
+      filter.$or = [
+        { productName: { $regex: search, $options: "i" } },
+      ];
+    }
+
+
+    // Pagination
+  
+
+    // Sorting
+   
+
+    // Fetch data
+    const products = await Product.find(filter)
+      .populate("adminId", "storeName email phoneNumber address")
+     
+
+    // Total count
+  
+
+    return res.send({
+      mess: "success",
+      status: 200,
+      text: "Product Fetch Successfully",
+      data: products,
+    });
+  } catch (err) {
+    return res.send({
+      mess: "error",
+      status: 400,
+      text: err.message,
+    });
+  }
+};

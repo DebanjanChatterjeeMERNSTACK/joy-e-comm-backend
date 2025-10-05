@@ -8,5 +8,6 @@ router.post("/add_product",authenticate,authorize(["manager","admin"]), productC
 router.get("/get_product",authenticate,authorize(["manager","admin"]), productController.getAllProducts);
 router.put("/update_product/:id",authenticate,authorize(["manager","admin"]), productController.updateProduct);
 router.delete("/delete_product/:id",authenticate,authorize(["manager","admin"]), productController.deleteProduct);
+router.get("/search_product",authenticate,authorize(["manager","admin"]), productController.getAllProductsSearch);
 
 module.exports = router;
